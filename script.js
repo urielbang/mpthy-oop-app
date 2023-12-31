@@ -14,6 +14,7 @@ class App {
   #mapEvent;
   #mapZoomLevel = 13;
   #workouts = [];
+
   constructor() {
     // get user's position
     this._getPosition();
@@ -130,6 +131,7 @@ class App {
     //! set local storage at all workouts
     this._setLocalStorage();
   }
+
   _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
       .addTo(this.#map)
@@ -151,6 +153,7 @@ class App {
     let html = `<li class="workout workout--${workout.type}" data-id="${
       workout.id
     }">
+    <span class="btnDelete">x</span>
     <h2 class="workout__title">${workout.description}</h2>
     <div class="workout__details">
       <span class="workout__icon">${
@@ -193,6 +196,17 @@ class App {
     }
     form.insertAdjacentHTML('afterend', html);
   }
+
+  _deleteItem(indexDelete) {
+    const updatEdRenderWorouts = this.#workouts.filter((workout, index) => {
+      return index !== indexDelete;
+    });
+    console.log(updatEdRenderWorouts);
+
+    this.#workouts = updatEdRenderWorouts;
+    localStorage.setItem('workouts', JSON.stringify(updatEdRenderWorouts));
+    location.reload();
+  }
   _moveToPopup(e) {
     const workoutEL = e.target.closest('.workout');
 
@@ -217,13 +231,24 @@ class App {
   }
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
+
     if (!data) return;
 
     this.#workouts = data;
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
+    const deleteButton = document.querySelectorAll('.btnDelete');
+
+    if (deleteButton !== null) {
+      deleteButton.forEach((buttonDelete, index) => {
+        buttonDelete.addEventListener('click', e => {
+          this._deleteItem(index);
+        });
+      });
+    }
   }
+
   reset() {
     localStorage.removeItem('workouts');
     location.reload();
