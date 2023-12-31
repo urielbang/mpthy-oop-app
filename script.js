@@ -15,7 +15,10 @@ class App {
   #mapZoomLevel = 13;
   #workouts = [];
   constructor() {
+    // get user's position
     this._getPosition();
+    // get data from local storage
+    this._getLocalStorage();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
@@ -120,6 +123,9 @@ class App {
 
     //! clear input fields
     this._hideForm();
+
+    //! set local storage at all workouts
+    this._setLocalStorage();
   }
   _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
@@ -200,8 +206,16 @@ class App {
       },
     });
 
-    // using the public interface
+    //! using the public interface
     workout.click();
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    console.log(data);
   }
 }
 //! class workout
